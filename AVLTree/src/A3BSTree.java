@@ -32,7 +32,15 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 
 	@Override
 	public boolean add(E e) {
-		 if(e.compareTo(root.value) <= 0) {
+		
+		// if value if null then we need to throw an exception !
+		if(e == null){
+			throw new NullPointerException();
+		}
+		
+		Node tempRoot = root;
+		
+		 if(e.compareTo(root.value) < 0) {
 			 if(root.left == null) {
 				 root.left = new Node(e);
 			 } else {
@@ -47,6 +55,7 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 				 add(e);
 			 }
 		 }
+		 root = tempRoot;
 		// TODO Auto-generated method stub
 		return true;
 	}
@@ -107,9 +116,13 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 	}
 	
 	public static void main(String[] args) {
-		A3BSTree<Integer> tree1 = new A3BSTree<>(3);
+		A3BSTree<Integer> tree1 = new A3BSTree<>(8);
 		tree1.add(5);
+		tree1.add(12);
 		tree1.add(2);
+		tree1.add(3);
+		tree1.add(10);
+		tree1.add(15);
 		tree1.iterator();
 		
 		
