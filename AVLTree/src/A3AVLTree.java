@@ -2,7 +2,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.lang.Object;
 
-public class A3AVLTree <E> implements Tree<E>{ //consider extending A3BSTree
+public class A3AVLTree <E extends Comparable<? super E>> extends A3BSTree<E> implements Tree<E>{ //consider extending A3BSTree
 
 	public A3AVLTree(){
 		// TODO Auto-generated method stub
@@ -49,5 +49,6 @@ public class A3AVLTree <E> implements Tree<E>{ //consider extending A3BSTree
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
 
 }
