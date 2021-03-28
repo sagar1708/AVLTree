@@ -185,11 +185,76 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 	public Iterator<E> iterator() {
 		// TODO Auto-generated method stub
 
-
-		Node tempRoot = root;
-		inOrder(tempRoot);
-		return null;
+		return new InorderIterator();
+		
+//		Node tempRoot = root;
+//		inOrder(tempRoot);
+//		return null;
 	}
+	
+	private class InorderIterator implements Iterator<E>
+	{
+		public InorderIterator()
+		{
+			inorder();
+			
+		}
+
+		@Override
+		public boolean hasNext() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public E next() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
+	
+	private void inorder() {
+				Traversal(root);
+		  }  
+	
+	 private void Traversal(Node root)
+	    {
+	        Node current, pre;
+	 
+	        if (root == null)
+	            return;
+	 
+	        current = root;
+	        while (current != null)
+	        {
+	            if (current.left == null)
+	            {
+	                System.out.println(current.value + " ");
+	                current = current.right;
+	            }
+	            else {
+	             
+	                pre = current.left;
+	                while (pre.right != null
+	                       && pre.right != current)
+	                    pre = pre.right;
+	 
+	                if (pre.right == null) {
+	                    pre.right = current;
+	                    current = current.left;
+	                }
+	 
+	                else
+	                {
+	                    pre.right = null;
+	                    System.out.println(current.value + " ");
+	                    current = current.right;
+	                } 
+	 
+	            }
+	 
+	        } 
+	    }
 
 	private void inOrder(Node tempRoot) {
 		//--------------- Other Implementation --------------//
@@ -251,8 +316,8 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 		return size;
 	}
 
-	//	public static void main(String[] args) {
-	//		A3BSTree<Integer> tree1 = new A3BSTree<>();
+		public static void main(String[] args) {
+			A3BSTree<Integer> tree1 = new A3BSTree<>();
 	////		tree1.add(1);
 	//////		tree1.add(2);
 	//		int[] arr = {200,20,45,0,1000,56,2,28,999,15,6,49,752};
@@ -266,9 +331,10 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 	////		System.out.println(tree1.contains(1));
 	////		System.out.println(tree1.size);
 	//
-	//		//		for(int i=1;i<=100020;i++) {
-	//		//			System.out.println(tree1.remove(i));
-	//		//		}
+					for(int i=1;i<=100000;i++) {
+						System.out.println(tree1.add(i));
+					}
+					tree1.iterator();
 	////		System.out.println(tree1.size);
 	//
 	//
@@ -319,5 +385,5 @@ public class A3BSTree <E extends Comparable<? super E>> implements Tree<E>{
 	//		//		tree1.iterator();
 	//
 	//
-	//	}
+		}
 }

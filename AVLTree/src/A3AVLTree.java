@@ -31,30 +31,37 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 	//		this.size = 1;
 	//	}
 
-	private Node rrRotation(Node y) {
-		Node x = y.left;
-		Node z = x.right;
+	private Node rrRotation(Node y) { //200
+		Node x = y.left; //45
+		Node z = x.right; // null
 
 		x.right = y;
 		y.left = z;
 
-		y.height = max(heightOfNode(y.left) , heightOfNode(y.right));
-		x.height = max(heightOfNode(x.left) , heightOfNode(x.right));
+		y.height = max(heightOfNode(y.left) , heightOfNode(y.right))+1;
+		x.height = max(heightOfNode(x.left) , heightOfNode(x.right))+1;
+		
+		y.balanceFactor = heightOfNode(y.left) - heightOfNode(y.right);
+		x.balanceFactor = heightOfNode(x.left) - heightOfNode(x.right);
+		
 
 		return x;
 	}
 
 	private Node lrRotation(Node x) {
 		Node y = x.right;
-		Node z = x.left;
+		Node z = y.left;
 
 		y.left = x;
 		x.right = z;
 
-		x.height = max(heightOfNode(x.left) , heightOfNode(x.right));
-		y.height = max(heightOfNode(y.left) , heightOfNode(y.right));
+		x.height = max(heightOfNode(x.left) , heightOfNode(x.right))+1;
+		y.height = max(heightOfNode(y.left) , heightOfNode(y.right))+1;
+		
+		x.balanceFactor = heightOfNode(x.left) - heightOfNode(x.right);
+		y.balanceFactor = heightOfNode(y.left) - heightOfNode(y.right);
 
-		return x;
+		return y;
 	}
 
 	private int max(int a,int b) {
@@ -82,8 +89,9 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 		// TODO Auto-generated method stub
 		// if value if null then we need to throw an exception !
 		Stack<Node> stack = new Stack<Node>();
+		Stack<Node> stackForParent = new Stack<Node>();
 		
-
+		
 		Node tempRoot = root;
 		if(root == null) {
 			size += 1;
@@ -99,10 +107,12 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 				y = tempRoot;
 				if(e.compareTo(tempRoot.value) < 0){
 					stack.push(tempRoot);
+					stackForParent.push(tempRoot);
 					tempRoot = tempRoot.left;
 
 				} else {
 					stack.push(tempRoot);
+					stackForParent.push(tempRoot);
 					tempRoot = tempRoot.right;
 				}
 			}
@@ -110,25 +120,38 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 			if(y == null){
 				y = newNode;
 				size += 1;
+				y.balanceFactor = 0;
 			} else if(e.compareTo(y.value) < 0){
 				y.left = newNode;
+				y.left.balanceFactor = 0;
 				size += 1;
 			} else if(e.compareTo(y.value) == 0) {
 				return false;
 			} else {
 				y.right = newNode;
+				y.right.balanceFactor = 0;
 				size += 1;
 			}
 			
+			
+			Node parent = null;
 			Node walkBackNode;
 			int lHeight,rHeight;
+			if(!stackForParent.empty()) {
+				stackForParent.pop();
+			}
+			
 //			System.out.println(stack.pop().value);
 			while(!stack.empty()) {
 				walkBackNode = stack.pop();
+//				walkBackNode.height = walkBackNode.height + 1;
+				if(!stackForParent.empty()) {
+					parent = stackForParent.pop();
+				}
 				if(walkBackNode.left == null) {
 					lHeight = -1;
 				} else {
-					lHeight = walkBackNode.left.height;
+					lHeight = walkBackNode.left.height ;
 				}
 				
 				if(walkBackNode.right == null) {
@@ -137,13 +160,54 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 					rHeight = walkBackNode.right.height;
 				}
 				
-				walkBackNode.balanceFactor = rHeight - lHeight;
+				walkBackNode.balanceFactor = lHeight - rHeight;
 				
 				walkBackNode.height = 1 + max(lHeight,rHeight);
 				
 				if((walkBackNode.balanceFactor < -1) || walkBackNode.balanceFactor > 1) {
 					// tree is violating the rules of AVL tree
-					break;
+					if(walkBackNode.balanceFactor > 1 && e.compareTo(walkBackNode.left.value) < 0) {
+						if(walkBackNode.value == this.root.value) {
+							this.root = rrRotation(walkBackNode);
+						} else {
+							parent.right = rrRotation(walkBackNode);
+						}
+						
+						return true;
+					}
+					if(walkBackNode.balanceFactor < -1 && e.compareTo(walkBackNode.right.value) > 0) {
+						if(walkBackNode.value == this.root.value) {
+							this.root = lrRotation(walkBackNode);
+						} else {
+							parent.left = lrRotation(walkBackNode);
+						}
+						
+						return true;
+					}
+					if(walkBackNode.balanceFactor > 1 && e.compareTo(walkBackNode.left.value) > 0) {
+						walkBackNode.left = lrRotation(walkBackNode.left);
+						
+						if(walkBackNode.value == this.root.value) {
+							this.root = rrRotation(walkBackNode);
+						} else {
+							parent.left = rrRotation(walkBackNode);
+						}
+//						rrRotation(walkBackNode);
+//						System.out.println("Root value:= " + values.balanceFactor);
+//						System.out.println("Left value:= " + values.left.balanceFactor);
+//						System.out.println("Right value:= " + values.right.balanceFactor);
+						return true;
+					}
+					if(walkBackNode.balanceFactor< -1 && e.compareTo(walkBackNode.right.value) < 0) {
+						walkBackNode.right = rrRotation(walkBackNode.right);
+						if(walkBackNode.value == this.root.value) {
+							this.root = lrRotation(walkBackNode);
+						} else {
+							parent.right = lrRotation(walkBackNode);
+						}
+//						lrRotation(walkBackNode); 
+						return true;
+					}
 				}
 			}
 		}
@@ -183,7 +247,7 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 
 
 
-//	private Node addHelper(Node node,E e) {
+//	public Node addHelper(Node node,E e) {
 //		if(node == null) {
 //			node =  (new Node(e));
 //			return node;
@@ -399,6 +463,8 @@ public class A3AVLTree <E extends Comparable<? super E>> implements Tree<E>{ //c
 			tree1.add(arr[i]);
 			//			System.out.println("Size :- "+tree1.size);
 		}
+		System.out.println("height :- " + tree1.height());
+//		tree1.add(arr[10]);
 
 		//		System.out.println(tree1.root.value);
 		tree1.iterator();
